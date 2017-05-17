@@ -36,7 +36,7 @@ static Camera			clCamera;
 // 
 // With VS 11, we could load up prebuilt .cso files instead... 
 //-------------------------------------------------------------------------------------- 
-HRESULT CompileShaderFromFile(WCHAR* szFileName, LPCSTR szEntryPoint, LPCSTR szShaderModel, ID3DBlob** ppBlobOut)
+HRESULT CompileShaderFromFile( WCHAR* szFileName, LPCSTR szEntryPoint, LPCSTR szShaderModel, ID3DBlob** ppBlobOut )
 {
 	HRESULT hr = S_OK;
 
@@ -53,18 +53,18 @@ HRESULT CompileShaderFromFile(WCHAR* szFileName, LPCSTR szEntryPoint, LPCSTR szS
 #endif 
 
 	ID3DBlob* pErrorBlob = nullptr;
-	hr = D3DCompileFromFile(szFileName, nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, szEntryPoint, szShaderModel,
-		dwShaderFlags, 0, ppBlobOut, &pErrorBlob);
-	if (FAILED(hr))
+	hr = D3DCompileFromFile( szFileName, nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, szEntryPoint, szShaderModel,
+		dwShaderFlags, 0, ppBlobOut, &pErrorBlob );
+	if( FAILED( hr ) )
 	{
-		if (pErrorBlob)
+		if( pErrorBlob )
 		{
-			OutputDebugStringA(reinterpret_cast<const char*>(pErrorBlob->GetBufferPointer()));
+			OutputDebugStringA( reinterpret_cast<const char*>( pErrorBlob->GetBufferPointer() ) );
 			pErrorBlob->Release();
 		}
 		return hr;
 	}
-	if (pErrorBlob) pErrorBlob->Release();
+	if( pErrorBlob ) pErrorBlob->Release();
 
 	return S_OK;
 }
@@ -92,7 +92,7 @@ HRESULT InitDevice()
 		D3D_DRIVER_TYPE_WARP,
 		D3D_DRIVER_TYPE_REFERENCE,
 	};
-	UINT numDriverTypes = ARRAYSIZE(driverTypes);
+	UINT numDriverTypes = ARRAYSIZE( driverTypes );
 
 	D3D_FEATURE_LEVEL featureLevels[] =
 	{
@@ -101,61 +101,61 @@ HRESULT InitDevice()
 		D3D_FEATURE_LEVEL_10_1,
 		D3D_FEATURE_LEVEL_10_0,
 	};
-	UINT numFeatureLevels = ARRAYSIZE(featureLevels);
+	UINT numFeatureLevels = ARRAYSIZE( featureLevels );
 
-	for (UINT driverTypeIndex = 0; driverTypeIndex < numDriverTypes; driverTypeIndex++)
+	for( UINT driverTypeIndex = 0; driverTypeIndex < numDriverTypes; driverTypeIndex++ )
 	{
 		g_driverType = driverTypes[driverTypeIndex];
-		hr = D3D11CreateDevice(nullptr, g_driverType, nullptr, createDeviceFlags, featureLevels, numFeatureLevels,
-			D3D11_SDK_VERSION, &g_pd3dDevice, &g_featureLevel, &g_pImmediateContext);
+		hr = D3D11CreateDevice( nullptr, g_driverType, nullptr, createDeviceFlags, featureLevels, numFeatureLevels,
+			D3D11_SDK_VERSION, &g_pd3dDevice, &g_featureLevel, &g_pImmediateContext );
 
-		if (hr == E_INVALIDARG)
+		if( hr == E_INVALIDARG )
 		{
 			// DirectX 11.0 platforms will not recognize D3D_FEATURE_LEVEL_11_1 so we need to retry without it 
-			hr = D3D11CreateDevice(nullptr, g_driverType, nullptr, createDeviceFlags, &featureLevels[1], numFeatureLevels - 1,
-				D3D11_SDK_VERSION, &g_pd3dDevice, &g_featureLevel, &g_pImmediateContext);
+			hr = D3D11CreateDevice( nullptr, g_driverType, nullptr, createDeviceFlags, &featureLevels[1], numFeatureLevels - 1,
+				D3D11_SDK_VERSION, &g_pd3dDevice, &g_featureLevel, &g_pImmediateContext );
 		}
 
-		if (SUCCEEDED(hr))
+		if( SUCCEEDED( hr ) )
 			break;
 	}
-	if (FAILED(hr))
+	if( FAILED( hr ) )
 		return hr;
 
 	// Obtain DXGI factory from device (since we used nullptr for pAdapter above) 
 	IDXGIFactory1* dxgiFactory = nullptr;
 	{
 		IDXGIDevice* dxgiDevice = nullptr;
-		hr = g_pd3dDevice->QueryInterface(__uuidof(IDXGIDevice), reinterpret_cast<void**>(&dxgiDevice));
-		if (SUCCEEDED(hr))
+		hr = g_pd3dDevice->QueryInterface( __uuidof( IDXGIDevice ), reinterpret_cast<void**>( &dxgiDevice ) );
+		if( SUCCEEDED( hr ) )
 		{
 			IDXGIAdapter* adapter = nullptr;
-			hr = dxgiDevice->GetAdapter(&adapter);
-			if (SUCCEEDED(hr))
+			hr = dxgiDevice->GetAdapter( &adapter );
+			if( SUCCEEDED( hr ) )
 			{
-				hr = adapter->GetParent(__uuidof(IDXGIFactory1), reinterpret_cast<void**>(&dxgiFactory));
+				hr = adapter->GetParent( __uuidof( IDXGIFactory1 ), reinterpret_cast<void**>( &dxgiFactory ) );
 				adapter->Release();
 			}
 			dxgiDevice->Release();
 		}
 	}
-	if (FAILED(hr))
+	if( FAILED( hr ) )
 		return hr;
 
 	// Create swap chain 
 	IDXGIFactory2* dxgiFactory2 = nullptr;
-	hr = dxgiFactory->QueryInterface(__uuidof(IDXGIFactory2), reinterpret_cast<void**>(&dxgiFactory2));
-	if (dxgiFactory2)
+	hr = dxgiFactory->QueryInterface( __uuidof( IDXGIFactory2 ), reinterpret_cast<void**>( &dxgiFactory2 ) );
+	if( dxgiFactory2 )
 	{
 		// DirectX 11.1 or later 
-		hr = g_pd3dDevice->QueryInterface(__uuidof(ID3D11Device1), reinterpret_cast<void**>(&g_pd3dDevice1));
-		if (SUCCEEDED(hr))
+		hr = g_pd3dDevice->QueryInterface( __uuidof( ID3D11Device1 ), reinterpret_cast<void**>( &g_pd3dDevice1 ) );
+		if( SUCCEEDED( hr ) )
 		{
-			(void)g_pImmediateContext->QueryInterface(__uuidof(ID3D11DeviceContext1), reinterpret_cast<void**>(&g_pImmediateContext1));
+			( void )g_pImmediateContext->QueryInterface( __uuidof( ID3D11DeviceContext1 ), reinterpret_cast<void**>( &g_pImmediateContext1 ) );
 		}
 
 		DXGI_SWAP_CHAIN_DESC1 sd;
-		ZeroMemory(&sd, sizeof(sd));
+		ZeroMemory( &sd, sizeof( sd ) );
 		sd.Width = width;
 		sd.Height = height;
 		sd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -164,10 +164,10 @@ HRESULT InitDevice()
 		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		sd.BufferCount = 1;
 
-		hr = dxgiFactory2->CreateSwapChainForHwnd(g_pd3dDevice, g_hWnd, &sd, nullptr, nullptr, &g_pSwapChain1);
-		if (SUCCEEDED(hr))
+		hr = dxgiFactory2->CreateSwapChainForHwnd( g_pd3dDevice, g_hWnd, &sd, nullptr, nullptr, &g_pSwapChain1 );
+		if( SUCCEEDED( hr ) )
 		{
-			hr = g_pSwapChain1->QueryInterface(__uuidof(IDXGISwapChain), reinterpret_cast<void**>(&g_pSwapChain));
+			hr = g_pSwapChain1->QueryInterface( __uuidof( IDXGISwapChain ), reinterpret_cast<void**>( &g_pSwapChain ) );
 		}
 
 		dxgiFactory2->Release();
@@ -176,7 +176,7 @@ HRESULT InitDevice()
 	{
 		// DirectX 11.0 systems 
 		DXGI_SWAP_CHAIN_DESC sd;
-		ZeroMemory(&sd, sizeof(sd));
+		ZeroMemory( &sd, sizeof( sd ) );
 		sd.BufferCount = 1;
 		sd.BufferDesc.Width = width;
 		sd.BufferDesc.Height = height;
@@ -189,36 +189,36 @@ HRESULT InitDevice()
 		sd.SampleDesc.Quality = 0;
 		sd.Windowed = TRUE;
 
-		hr = dxgiFactory->CreateSwapChain(g_pd3dDevice, &sd, &g_pSwapChain);
+		hr = dxgiFactory->CreateSwapChain( g_pd3dDevice, &sd, &g_pSwapChain );
 	}
 
-	dxgiFactory->MakeWindowAssociation(g_hWnd, DXGI_MWA_NO_ALT_ENTER);
+	dxgiFactory->MakeWindowAssociation( g_hWnd, DXGI_MWA_NO_ALT_ENTER );
 
 	dxgiFactory->Release();
 
-	if (FAILED(hr))
+	if( FAILED( hr ) )
 	{
 		return hr;
 	}
 
 	// Create a render target view 
 	ID3D11Texture2D* pBackBuffer = nullptr;
-	hr = g_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&pBackBuffer));
-	if (FAILED(hr))
+	hr = g_pSwapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), reinterpret_cast<void**>( &pBackBuffer ) );
+	if( FAILED( hr ) )
 	{
 		return hr;
 	}
 
-	hr = g_pd3dDevice->CreateRenderTargetView(pBackBuffer, nullptr, &g_pRenderTargetView);
+	hr = g_pd3dDevice->CreateRenderTargetView( pBackBuffer, nullptr, &g_pRenderTargetView );
 	pBackBuffer->Release();
-	if (FAILED(hr))
+	if( FAILED( hr ) )
 	{
 		return hr;
 	}
 
 	// Create depth stencil texture 
 	D3D11_TEXTURE2D_DESC descDepth;
-	ZeroMemory(&descDepth, sizeof(descDepth));
+	ZeroMemory( &descDepth, sizeof( descDepth ) );
 	descDepth.Width = width;
 	descDepth.Height = height;
 	descDepth.MipLevels = 1;
@@ -230,47 +230,47 @@ HRESULT InitDevice()
 	descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 	descDepth.CPUAccessFlags = 0;
 	descDepth.MiscFlags = 0;
-	hr = g_pd3dDevice->CreateTexture2D(&descDepth, nullptr, &g_pDepthStencil);
-	if (FAILED(hr))
+	hr = g_pd3dDevice->CreateTexture2D( &descDepth, nullptr, &g_pDepthStencil );
+	if( FAILED( hr ) )
 	{
 		return hr;
 	}
 	// Create the depth stencil view 
 	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
-	ZeroMemory(&descDSV, sizeof(descDSV));
+	ZeroMemory( &descDSV, sizeof( descDSV ) );
 	descDSV.Format = descDepth.Format;
 	descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	descDSV.Texture2D.MipSlice = 0;
-	hr = g_pd3dDevice->CreateDepthStencilView(g_pDepthStencil, &descDSV, &g_pDepthStencilView);
-	if (FAILED(hr))
+	hr = g_pd3dDevice->CreateDepthStencilView( g_pDepthStencil, &descDSV, &g_pDepthStencilView );
+	if( FAILED( hr ) )
 	{
 		return hr;
 	}
-	g_pImmediateContext->OMSetRenderTargets(1, &g_pRenderTargetView, g_pDepthStencilView);
+	g_pImmediateContext->OMSetRenderTargets( 1, &g_pRenderTargetView, g_pDepthStencilView );
 
 	// Setup the viewport 
 	D3D11_VIEWPORT vp;
-	vp.Width = (FLOAT)width;
-	vp.Height = (FLOAT)height;
+	vp.Width = ( FLOAT )width;
+	vp.Height = ( FLOAT )height;
 	vp.MinDepth = 0.0f;
 	vp.MaxDepth = 1.0f;
 	vp.TopLeftX = 0;
 	vp.TopLeftY = 0;
-	g_pImmediateContext->RSSetViewports(1, &vp);
+	g_pImmediateContext->RSSetViewports( 1, &vp );
 
 	// Compile the vertex shader 
 	ID3DBlob* pVSBlob = nullptr;
-	hr = CompileShaderFromFile(L"Shaders/Standard_VS.hlsl", "VS", "vs_4_0", &pVSBlob);
-	if (FAILED(hr))
+	hr = CompileShaderFromFile( L"Shaders/Standard_VS.hlsl", "VS", "vs_4_0", &pVSBlob );
+	if( FAILED( hr ) )
 	{
-		MessageBox(nullptr,
-			L"The VS hlsl file cannot be compiled.  Please run this executable from the directory that contains the VS hlsl file.", L"Error", MB_OK);
+		MessageBox( nullptr,
+			L"The VS hlsl file cannot be compiled.  Please run this executable from the directory that contains the VS hlsl file.", L"Error", MB_OK );
 		return hr;
 	}
 
 	// Create the vertex shader 
-	hr = g_pd3dDevice->CreateVertexShader(pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), nullptr, &g_pVertexShader);
-	if (FAILED(hr))
+	hr = g_pd3dDevice->CreateVertexShader( pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), nullptr, &g_pVertexShader );
+	if( FAILED( hr ) )
 	{
 		pVSBlob->Release();
 		return hr;
@@ -286,29 +286,29 @@ HRESULT InitDevice()
 	UINT numElements = ARRAYSIZE(layout);
 
 	// Create the input layout 
-	hr = g_pd3dDevice->CreateInputLayout(layout, numElements, pVSBlob->GetBufferPointer(),
-		pVSBlob->GetBufferSize(), &g_pVertexLayout);
+	hr = g_pd3dDevice->CreateInputLayout( layout, numElements, pVSBlob->GetBufferPointer(),
+		pVSBlob->GetBufferSize(), &g_pVertexLayout );
 	pVSBlob->Release();
-	if (FAILED(hr))
+	if( FAILED( hr ) )
 	{
 		return hr;
 	}
 
 	// Set the input layout 
-	g_pImmediateContext->IASetInputLayout(g_pVertexLayout);
+	g_pImmediateContext->IASetInputLayout( g_pVertexLayout );
 
 	// Compile the pixel shader 
 	ID3DBlob* pPSBlob = nullptr;
-	hr = CompileShaderFromFile(L"Shaders/Standard_PS.hlsl", "PS", "ps_4_0", &pPSBlob);
+	hr = CompileShaderFromFile( L"Shaders/Standard_PS.hlsl", "PS", "ps_4_0", &pPSBlob );
 	if( FAILED( hr ) )
 	{
-		MessageBox(nullptr,
-			L"The PS hlsl file cannot be compiled.  Please run this executable from the directory that contains the PS hlsl file.", L"Error", MB_OK);
+		MessageBox( nullptr,
+			L"The PS hlsl file cannot be compiled.  Please run this executable from the directory that contains the PS hlsl file.", L"Error", MB_OK );
 		return hr;
 	}
 
 	// Create the pixel shader 
-	hr = g_pd3dDevice->CreatePixelShader(pPSBlob->GetBufferPointer(), pPSBlob->GetBufferSize(), nullptr, &g_pPixelShader);
+	hr = g_pd3dDevice->CreatePixelShader( pPSBlob->GetBufferPointer(), pPSBlob->GetBufferSize(), nullptr, &g_pPixelShader );
 	pPSBlob->Release();
 	if( FAILED( hr ) )
 	{
@@ -418,8 +418,8 @@ void SetupModel( Model &model )
 	{
 		{ -1.0f, 1.0f, -1.0f },
 		{ 1.0f, 1.0f, -1.0f },
-		{1.0f, 1.0f, 1.0f },
-		{-1.0f, 1.0f, 1.0f },
+		{ 1.0f, 1.0f, 1.0f },
+		{ -1.0f, 1.0f, 1.0f },
 		
 		{ -1.0f, -1.0f, -1.0f },
 		{ 1.0f, -1.0f, -1.0f },
@@ -452,15 +452,15 @@ void SetupModel( Model &model )
 
 	float y[24][3] = 
 	{
-		{0.0f, 1.0f, 0.0f},
-		{0.0f, 1.0f, 0.0f},
-		{0.0f, 1.0f, 0.0f},
-		{0.0f, 1.0f, 0.0f},
-		{0.0f, 1.0f, 0.0f},
-		{0.0f, 1.0f, 0.0f},
-		{0.0f, 1.0f, 0.0f},
-		{0.0f, 1.0f, 0.0f},
-		{0.0f, 1.0f, 0.0f},
+		{ 0.0f, 1.0f, 0.0f },
+		{ 0.0f, 1.0f, 0.0f },
+		{ 0.0f, 1.0f, 0.0f },
+		{ 0.0f, 1.0f, 0.0f },
+		{ 0.0f, 1.0f, 0.0f },
+		{ 0.0f, 1.0f, 0.0f },
+		{ 0.0f, 1.0f, 0.0f },
+		{ 0.0f, 1.0f, 0.0f },
+		{ 0.0f, 1.0f, 0.0f },
 		{ 0.0f, 1.0f, 0.0f },
 		{ 0.0f, 1.0f, 0.0f },
 		{ 0.0f, 1.0f, 0.0f },
@@ -482,35 +482,35 @@ void SetupModel( Model &model )
 
 	float z[24][2] = 
 	{
-		{1.0f, 0.0f},
-		{0.0f, 0.0f},
-		{0.0f, 1.0f},
-		{1.0f, 1.0f},
+		{ 1.0f, 0.0f },
+		{ 0.0f, 0.0f },
+		{ 0.0f, 1.0f },
+		{ 1.0f, 1.0f },
 
-		{0.0f, 0.0f},
-		{1.0f, 0.0f},
-		{1.0f, 1.0f},
-		{0.0f, 1.0f},
+		{ 0.0f, 0.0f },
+		{ 1.0f, 0.0f },
+		{ 1.0f, 1.0f },
+		{ 0.0f, 1.0f },
 
-		{0.0f, 1.0f},
-		{1.0f, 1.0f},
-		{1.0f, 0.0f},
-		{0.0f, 0.0f},
+		{ 0.0f, 1.0f },
+		{ 1.0f, 1.0f },
+		{ 1.0f, 0.0f },
+		{ 0.0f, 0.0f },
 
-		{1.0f, 1.0f},
-		{0.0f, 1.0f},
-		{0.0f, 0.0f},
-		{1.0f, 0.0f},
+		{ 1.0f, 1.0f },
+		{ 0.0f, 1.0f },
+		{ 0.0f, 0.0f },
+		{ 1.0f, 0.0f },
 
-		{0.0f, 1.0f},
-		{1.0f, 1.0f},
-		{1.0f, 0.0f},
-		{0.0f, 0.0f},
+		{ 0.0f, 1.0f },
+		{ 1.0f, 1.0f },
+		{ 1.0f, 0.0f },
+		{ 0.0f, 0.0f },
 
-		{1.0f, 1.0f},
-		{0.0f, 1.0f},
-		{0.0f, 0.0f},
-		{1.0f, 0.0f},
+		{ 1.0f, 1.0f },
+		{ 0.0f, 1.0f },
+		{ 0.0f, 0.0f },
+		{ 1.0f, 0.0f },
 
 	};
 
@@ -518,23 +518,23 @@ void SetupModel( Model &model )
 
 	WORD indices[] =
 	{
-		3,1,0,
-		2,1,3,
+		3, 1, 0,
+		2, 1, 3,
 
-		6,4,5,
-		7,4,6,
+		6, 4, 5,
+		7, 4, 6,
 
-		11,9,8,
-		10,9,11,
+		11, 9, 8,
+		10, 9, 11,
 
-		14,12,13,
-		15,12,14,
+		14, 12, 13,
+		15, 12, 14,
 
-		19,17,16,
-		18,17,19,
+		19, 17, 16,
+		18, 17, 19,
 
-		22,20,21,
-		23,20,22
+		22, 20, 21,
+		23, 20, 22
 	};
 
 	memcpy( model.indices, indices, sizeof( indices ) );
@@ -647,23 +647,23 @@ HRESULT Render()
 //-------------------------------------------------------------------------------------- 
 void CleanupDevice()
 {
-	if (g_pImmediateContext) g_pImmediateContext->ClearState();
+	if( g_pImmediateContext ) g_pImmediateContext->ClearState();
 
-	if (g_pSamplerLinear) g_pSamplerLinear->Release();
-	if (g_pTextureRV) g_pTextureRV->Release();
-	if (g_pConstantBuffer) g_pConstantBuffer->Release();
-	if (g_pVertexBuffer) g_pVertexBuffer->Release();
-	if (g_pIndexBuffer) g_pIndexBuffer->Release();
-	if (g_pVertexLayout) g_pVertexLayout->Release();
-	if (g_pVertexShader) g_pVertexShader->Release();
-	if (g_pPixelShader) g_pPixelShader->Release();
-	if (g_pRenderTargetView) g_pRenderTargetView->Release();
-	if (g_pDepthStencil) g_pDepthStencil->Release();
-	if (g_pDepthStencilView) g_pDepthStencilView->Release();
-	if (g_pSwapChain1) g_pSwapChain1->Release();
-	if (g_pSwapChain) g_pSwapChain->Release();
-	if (g_pImmediateContext1) g_pImmediateContext1->Release();
-	if (g_pImmediateContext) g_pImmediateContext->Release();
-	if (g_pd3dDevice1) g_pd3dDevice1->Release();
-	if (g_pd3dDevice) g_pd3dDevice->Release();
+	if( g_pSamplerLinear ) g_pSamplerLinear->Release();
+	if( g_pTextureRV ) g_pTextureRV->Release();
+	if( g_pConstantBuffer ) g_pConstantBuffer->Release();
+	if( g_pVertexBuffer ) g_pVertexBuffer->Release();
+	if( g_pIndexBuffer ) g_pIndexBuffer->Release();
+	if( g_pVertexLayout ) g_pVertexLayout->Release();
+	if( g_pVertexShader ) g_pVertexShader->Release();
+	if( g_pPixelShader ) g_pPixelShader->Release();
+	if( g_pRenderTargetView ) g_pRenderTargetView->Release();
+	if( g_pDepthStencil ) g_pDepthStencil->Release();
+	if( g_pDepthStencilView ) g_pDepthStencilView->Release();
+	if( g_pSwapChain1 ) g_pSwapChain1->Release();
+	if( g_pSwapChain ) g_pSwapChain->Release();
+	if( g_pImmediateContext1 ) g_pImmediateContext1->Release();
+	if( g_pImmediateContext ) g_pImmediateContext->Release();
+	if( g_pd3dDevice1 ) g_pd3dDevice1->Release();
+	if( g_pd3dDevice ) g_pd3dDevice->Release();
 }
