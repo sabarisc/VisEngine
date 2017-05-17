@@ -4,3 +4,17 @@
 .gitattributes
 .gitattributes
 .gitattributes
+Debug/VisEngine.exe
+Debug/VisEngine.ilk
+Debug/VisEngine.pdb
+*.ipch
+*.opensdf
+*.sdf
+*.obj
+*.enc
+*.idb
+*.pdb
+*.pch
+*.res
+*.tlog
+*.log
